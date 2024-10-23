@@ -17,6 +17,15 @@ app.use(express.static(path.join(__dirname + "/public")));
 app.use(cors());
 app.use(express.json());
 
+
+// Update CORS Configuration
+const corsOptions = {
+  origin: 'https://helpful-longma-fde6b8.netlify.app', // Your Netlify frontend URL
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
+
+
 // Database Connection using environment variables from the .env file
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
