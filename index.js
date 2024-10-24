@@ -17,7 +17,7 @@ app.use(express.json()); // To parse JSON request bodies
 
 // CORS Middleware
 const corsOptions = {
-  origin: 'https://bnoregistraclient.netlify.app',
+  origin: 'https://bnoregistraclienti.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
