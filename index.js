@@ -26,21 +26,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// ** Add the CSP (Content-Security-Policy) Middleware here **
-app.use((req, res, next) => {
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self'; " +
-    "script-src 'self' https://maps.googleapis.com; " +  // Google Maps scripts
-    "img-src 'self' https://raw.githubusercontent.com https://bnoinformatica.com https://www.linkedin.com https://www.instagram.com https://www.facebook.com https://maps.googleapis.com https://maps.gstatic.com; " +  // Images from external sources
-    "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://bnoregistraclienti.netlify.app; " +  // Google Maps API connections and your client
-    "frame-src 'self' https://www.facebook.com https://www.google.com https://www.google.com/maps; " +  // Allow Facebook, Google Maps embeds
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +  // Allow Google Fonts and inline styles
-    "font-src 'self' https://fonts.gstatic.com;"  // Allow Google Fonts
-  );
-  next();
-});
-
+ 
 // Database Connection
 const db = mysql.createConnection(
   process.env.JAWSDB_URL || {
