@@ -29,8 +29,6 @@ app.use(cors(corsOptions));
 // Ensure the backend can handle preflight OPTIONS requests
 app.options('*', cors(corsOptions));  // Enable pre-flight across all routes
 
-
-
 // Removed CSP middleware for now
 
 // Database Connection
@@ -61,9 +59,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
-
-
-
 
 // Basic route
 app.get('/', (req, res) => {
