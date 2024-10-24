@@ -23,6 +23,21 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// ** Add the CSP Middleware here **
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; " + 
+    "script-src 'self' https://maps.googleapis.com; " +  // Google Maps scripts
+    "img-src 'self' https://raw.githubusercontent.com https://bnoinformatica.com https://www.linkedin.com https://www.instagram.com https://www.facebook.com https://maps.googleapis.com https://maps.gstatic.com; " +  // Images from external sources
+    "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; " +  // Google Maps API connections
+    "frame-src 'self' https://www.facebook.com https://www.google.com https://www.google.com/maps; " +  // Allow Facebook, Google Maps embeds
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " + // Allow Google Fonts and inline styles
+    "font-src 'self' https://fonts.gstatic.com;"  // Allow Google Fonts
+  );
+  next();
+});
+
 
 
 // Database Connection
@@ -95,7 +110,7 @@ app.post('/api/register', async (req, res) => {
             <div style="font-family: Arial, sans-serif; color: #333; background-image: url('https://raw.githubusercontent.com/abenezerregasa/images/refs/heads/main/%E2%80%94Pngtree%E2%80%94technological%20sense%20geometric%20line%20simple_932581.jpg'); background-size: cover; background-position: center; background-color: #f4f4f4; padding: 20px;">
               <div style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
                 <div style="text-align: center;">
-                  <img src="https://bnoinformatica.com/wp-content/uploads/2024/05/BNO-informatica-Messina-logo.png" alt="Your Logo" style="width: 150px; margin-bottom: 20px;" />
+                  <img src="https://raw.githubusercontent.com/abenezerregasa/images/refs/heads/main/logo%402x.png" alt="Your Logo" style="width: 150px; margin-bottom: 20px;" />
                 </div>
                 <h1 style="text-align: center; color: #0C89C0;">Welcome, ${first_name}!</h1>
                 <p style="font-size: 18px; text-align: center;">We are thrilled to have you join us at <strong>BNO Informatica</strong>. Here’s a summary of your details:</p>
