@@ -17,11 +17,13 @@ app.use(express.json()); // To parse JSON request bodies
 
 // CORS Middleware
 const corsOptions = {
-  origin: 'https://671a1935e5e76eb44f60fb82--bnoregistraclient.netlify.app',
+  origin: 'https://bnoregistraclient.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
+
+
 
 // Database Connection
 const db = mysql.createConnection(
