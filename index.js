@@ -17,10 +17,10 @@ app.use(express.json()); // To parse JSON request bodies
 
 // CORS Middleware
 const corsOptions = {
-  origin: 'https://bnoregistraclienti.netlify.app',  // Your client-side domain
+  origin: ['https://bno-app-ui-e081495806c6.herokuapp.com'],  // Frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,  // Allows credentials (cookies, authorization headers)
+  credentials: true,  // Allow credentials such as cookies
 };
 app.use(cors(corsOptions));
 
