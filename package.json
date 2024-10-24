@@ -3,11 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",                      
-    "build": "vite build",             
-    "start": "vite preview --port $PORT",  
+    "dev": "vite",                                 
+    "start": "vite preview --port $PORT",
+    "build": "cd ..client/client && npm run build", 
     "lint": "eslint --ext .ts,.tsx src"  
   },
+
+
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.3",
     "axios": "^1.7.7",
