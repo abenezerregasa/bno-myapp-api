@@ -62,9 +62,12 @@ app.get('/', (req, res) => {
 
 // User Registration
 app.post('/api/register', async (req, res) => {
+  console.log('Received registration request:', req.body); // Log incoming data
+  
   const { first_name, last_name, email, phone_number, password } = req.body;
 
   if (!first_name || !last_name || !email || !phone_number || !password) {
+    console.log('Missing required fields');  // Log missing fields error
     return res.status(400).json({ error: 'All fields are required' });
   }
 
@@ -72,18 +75,22 @@ app.post('/api/register', async (req, res) => {
     const checkUserSql = 'SELECT * FROM users WHERE email = ? OR phone_number = ?';
     db.query(checkUserSql, [email, phone_number], async (err, results) => {
       if (err) {
+        console.error('Database query error:', err);  // Log any database errors
         return res.status(500).json({ error: 'Error checking user credentials' });
       }
 
       if (results.length > 0) {
+        console.log('User already exists:', results); // Log if user already exists
         return res.status(409).json({ error: 'Email or phone number already registered. Please use different credentials.' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-
+      console.log('Hashed password:', hashedPassword); // Log hashed password
+      
       const insertUserSql = 'INSERT INTO users (first_name, last_name, email, phone_number, password) VALUES (?, ?, ?, ?, ?)';
       db.query(insertUserSql, [first_name, last_name, email, phone_number, hashedPassword], (err, result) => {
         if (err) {
+          console.error('Error inserting user into database:', err); // Log errors during insert
           return res.status(500).json({ error: 'Error registering user' });
         }
 
@@ -115,42 +122,53 @@ app.post('/api/register', async (req, res) => {
 
         transporter.sendMail(mailOptions, (err, info) => {
           if (err) {
+            console.error('Error sending email:', err); // Log email errors
             return res.status(500).json({ error: 'Registration successful, but email could not be sent.' });
           }
+          console.log('User registered successfully:', first_name); // Log successful registration
           res.status(201).json({ message: `Welcome, ${first_name}! You have successfully registered.` });
         });
       });
     });
   } catch (err) {
+    console.error('Server error:', err);  // Log any unexpected server errors
     return res.status(500).json({ error: 'Server error' });
   }
 });
 
 // User Login
 app.post('/api/login', (req, res) => {
+  console.log('Received login request:', req.body);  // Log login request data
+  
   const { email, password } = req.body;
 
   if (!email || !password) {
+    console.log('Missing email or password');  // Log missing credentials
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
   const sql = 'SELECT * FROM users WHERE email = ?';
   db.query(sql, [email], (err, results) => {
     if (err) {
+      console.error('Database query error:', err);  // Log database error
       return res.status(500).json({ error: 'Error fetching user data' });
     }
 
     if (results.length > 0) {
       const user = results[0];
+      console.log('User found:', user.email);  // Log found user
 
       bcrypt.compare(password, user.password, (err, isMatch) => {
         if (isMatch) {
+          console.log('Password matched for:', user.email);  // Log successful login
           res.status(200).json({ message: `Welcome back, ${user.first_name}!` });
         } else {
+          console.log('Invalid credentials for:', user.email);  // Log invalid login
           res.status(401).json({ error: 'Invalid credentials' });
         }
       });
     } else {
+      console.log('User not found for email:', email);  // Log user not found
       res.status(404).json({ error: 'User not found' });
     }
   });
