@@ -17,9 +17,10 @@ app.use(express.json()); // To parse JSON request bodies
 
 // CORS Middleware
 const corsOptions = {
-  origin: 'https://bnoregistraclienti.netlify.app',
+  origin: 'https://bnoregistraclienti.netlify.app',  // Your client-side domain
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,  // Allows credentials (cookies, authorization headers)
 };
 app.use(cors(corsOptions));
 
@@ -27,18 +28,16 @@ app.use(cors(corsOptions));
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; " + 
+    "default-src 'self'; " +
     "script-src 'self' https://maps.googleapis.com; " +  // Google Maps scripts
     "img-src 'self' https://raw.githubusercontent.com https://bnoinformatica.com https://www.linkedin.com https://www.instagram.com https://www.facebook.com https://maps.googleapis.com https://maps.gstatic.com; " +  // Images from external sources
-    "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; " +  // Google Maps API connections
+    "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://bnoregistraclienti.netlify.app; " +  // Google Maps API connections and your client
     "frame-src 'self' https://www.facebook.com https://www.google.com https://www.google.com/maps; " +  // Allow Facebook, Google Maps embeds
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " + // Allow Google Fonts and inline styles
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +  // Allow Google Fonts and inline styles
     "font-src 'self' https://fonts.gstatic.com;"  // Allow Google Fonts
   );
   next();
 });
-
-
 
 // Database Connection
 const db = mysql.createConnection(
@@ -58,12 +57,11 @@ db.connect((err) => {
   }
 });
 
-
 // Initialize Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST, // You should have this defined in your .env
+  host: process.env.EMAIL_HOST, 
   port: process.env.EMAIL_PORT,
-  secure: false, // If true, it will use TLS, otherwise, it'll use STARTTLS
+  secure: false, // Use TLS if true
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -123,16 +121,6 @@ app.post('/api/register', async (req, res) => {
                 <div style="text-align: center; margin-top: 30px;">
                   <a href="https://bnoinformatica.com" style="padding: 15px 30px; font-size: 18px; background-color: #0C89C0; color: white; text-decoration: none; border-radius: 5px; display: inline-block; width: auto;">Visit BNO</a>
                 </div>
-                <div style="text-align: center; margin-top: 20px;">
-                  <a href="https://www.google.com/maps/place/BNO+Informatica+-+Assistenza+tecnica+Computer+e+Telefonia+-+Messina/@38.1892396,15.5566559,17z/data=!3m1!4b1!4m6!3m5!1s0x13144e79839695c3:0x4d7aa8a1a65227cc!8m2!3d38.1892396!4d15.5566559!16s%2Fg%2F1vv2pgkz?entry=ttu&g_ep=EgoyMDI0MTAxNi4wIKXMDSoASAFQAw%3D%3D" style="padding: 15px 30px; font-size: 18px; background-color: #2BA5CB; color: white; text-decoration: none; border-radius: 5px; display: inline-block; width: auto;">Navigate to BNO on Google Maps</a>
-                </div>
-                <div style="text-align: center; margin-top: 50px;">
-                  <p style="font-size: 14px; color: #888;">Follow us on social media:</p>
-                  <a href="https://www.facebook.com/bnoinformatica" style="margin-right: 10px;"><img src="https://cdn.pixabay.com/photo/2017/06/22/06/22/facebook-2429746_1280.png" alt="Facebook" style="width: 30px;"></a>
-                  <a href="https://www.linkedin.com/company/bno-informatica/posts/?feedView=all" style="margin-right: 10px;"><img src="https://cdn.pixabay.com/photo/2017/08/22/11/56/linked-in-2668700_1280.png" alt="LinkedIn" style="width: 30px;"></a>
-                  <a href="https://www.instagram.com/bnoinformatica?igsh=MXU4c21wNGM4dG1nbw=="><img src="https://cdn.pixabay.com/photo/2022/04/01/05/40/app-7104075_1280.png" alt="Instagram" style="width: 30px;"></a>
-                </div>
-                <p style="text-align: center; font-size: 12px; color: #999;">If you didn't register on our platform, please ignore this email.</p>
               </div>
             </div>
           `,
@@ -155,7 +143,6 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Check if both email and password are provided
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
@@ -163,41 +150,24 @@ app.post('/api/login', (req, res) => {
   const sql = 'SELECT * FROM users WHERE email = ?';
   db.query(sql, [email], (err, results) => {
     if (err) {
-      console.error('Error fetching user data:', err);
       return res.status(500).json({ error: 'Error fetching user data' });
     }
 
-    // Check if the user exists
     if (results.length > 0) {
       const user = results[0];
 
-      // Compare the hashed password with the input password
       bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (err) {
-          console.error('Error comparing passwords:', err);
-          return res.status(500).json({ error: 'Server error during login' });
-        }
-
         if (isMatch) {
-          // Successful login
           res.status(200).json({ message: `Welcome back, ${user.first_name}!` });
         } else {
-          // Password does not match
           res.status(401).json({ error: 'Invalid credentials' });
         }
       });
     } else {
-      // User not found
       res.status(404).json({ error: 'User not found' });
     }
   });
 });
-
-
-
-
-
-
 
 // Start the server
 app.listen(port, () => {
