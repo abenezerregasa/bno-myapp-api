@@ -15,21 +15,23 @@ const port = process.env.PORT || 5001;
 app.use(express.static(path.join(__dirname + "/public")));
 app.use(express.json()); // To parse JSON request bodies
 
-// CORS Middleware (apply once, and allow requests from your frontend)
+// CORS Middleware
 const corsOptions = {
-  origin: 'http://localhost:3000', // Frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add OPTIONS method for preflight requests
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
 
 // Database Connection
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+const db = mysql.createConnection(
+  process.env.JAWSDB_URL || {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  }
+);
 
 db.connect((err) => {
   if (err) {
@@ -37,6 +39,18 @@ db.connect((err) => {
   } else {
     console.log('Connected to MySQL database');
   }
+});
+
+
+// Initialize Nodemailer Transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST, // You should have this defined in your .env
+  port: process.env.EMAIL_PORT,
+  secure: false, // If true, it will use TLS, otherwise, it'll use STARTTLS
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 // Basic route
