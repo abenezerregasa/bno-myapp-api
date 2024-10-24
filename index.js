@@ -17,12 +17,19 @@ app.use(express.json()); // To parse JSON request bodies
 
 // CORS Middleware
 const corsOptions = {
-  origin: ['https://bno-app-ui-e081495806c6.herokuapp.com'],  // Frontend URL
+  origin: ['https://bno-app-ui-e081495806c6.herokuapp.com'],  // Your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,  // Allow credentials such as cookies
+  credentials: true,  // This allows cookies and credentials
+  optionsSuccessStatus: 200 // For legacy browser support
 };
+
 app.use(cors(corsOptions));
+
+// Ensure the backend can handle preflight OPTIONS requests
+app.options('*', cors(corsOptions));  // Enable pre-flight across all routes
+
+
 
 // Removed CSP middleware for now
 
@@ -54,6 +61,9 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
+
+
 
 // Basic route
 app.get('/', (req, res) => {
